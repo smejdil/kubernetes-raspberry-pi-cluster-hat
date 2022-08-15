@@ -63,11 +63,11 @@ pi:encrypted-password
 
 Host name      |   External IP |    Internal IP | Role   |
 ---------------|---------------|----------------|--------|
-rpi-k8s-master | 192.168.1.164 | 172.19.181.254 | master |
-p1             |      NAT      | 172.19.181.1   | worker |
-p2             |      NAT      | 172.19.181.2   | worker |
-p3             |      NAT      | 172.19.181.3   | worker |
-p4             |      NAT      | 172.19.181.4   | worker |
+rpi-k8s-master | 192.168.5.150 | 172.19.180.150 | master |
+p1             |      NAT      | 172.19.180.1   | worker |
+p2             |      NAT      | 172.19.180.2   | worker |
+p3             |      NAT      | 172.19.180.3   | worker |
+p4             |      NAT      | 172.19.180.4   | worker |
 
 Diagram 
 
@@ -76,8 +76,8 @@ Diagram
 It's always a good start with a fresh up to date system. Something particular of Raspbian is that you should use `full-upgrade` instead of just `upgrade` as it could be the case that it doesn't download all the dependencies of the new packages, kind of weird. 
 
 ```shell
-$ sudo apt update
-$ sudo apt full-upgrade
+$ sudo aptitude update
+$ sudo aptitude safe-upgrade
 ```
 
 ### Change the hostname 
@@ -103,7 +103,7 @@ Host *
   ServerAliveInterval 180
   ServerAliveCountMax 2
   IdentitiesOnly=yes
-  IdentityFile ~/.ssh/local_rsa
+  IdentityFile ~/.ssh/local_ed25519
 
 Host p1
     Hostname 172.19.181.1
@@ -111,25 +111,46 @@ Host p1
 Host p2
     Hostname 172.19.181.2
     User pi
+Host p2
+    Hostname 172.19.181.3
+    User pi
+Host p2
+    Hostname 172.19.181.4
+    User pi
 ```
 
 Add the pi zeros IPs to the local hosts file.
 
 ```shell
-$ cat | sudo tee -a /etc/hosts << HERE
+cat | sudo tee -a /etc/hosts << HERE
 172.19.181.1    p1
 172.19.181.2    p2
+172.19.181.3    p3
+172.19.181.4    p4
 HERE
+```
+
+### Start ClusterHat nodes
+```shell
+clusterhat init
+clusterhat on p1
+clusterhat on p2
+clusterhat on p3
+clusterhat on p4
 ```
 
 ### Generate SSH Keys and Copy to the Pi Zeros
 
 ```shell
-ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/local_rsa -C "local key ClusterHAT"
+ssh-keygen -t ed25519 -b 4096 -N "" -f ~/.ssh/local_ed25519 -C "local key ClusterHAT"
 
-ssh-copy-id -i .ssh/local_rsa.pub p1
+ssh-copy-id -i .ssh/local_ed25519.pub p1
 
-ssh-copy-id -i .ssh/local_rsa.pub p2
+ssh-copy-id -i .ssh/local_ed25519.pub p2
+
+ssh-copy-id -i .ssh/local_ed25519.pub p3
+
+ssh-copy-id -i .ssh/local_ed25519.pub p4
 ```
 ### Install the Client Tools
 
@@ -146,7 +167,7 @@ Verify it’s working
 $ cfssl version
 Version: 1.2.0
 Revision: dev
-Runtime: go1.8.3
+Runtime: go1.15.9
 ```
 
 Install tmux
