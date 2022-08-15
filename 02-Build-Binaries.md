@@ -166,10 +166,10 @@ git clone https://github.com/kubernetes-sigs/cri-tools.git
 docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
 
 root@da0beb1cf478:/usr/src/myapp# make
-root@da0beb1cf478:/usr/src/myapp# _output/crictl --version
-crictl version 1.18.0
+root@da0beb1cf478:/usr/src/myapp# ./build/bin/crictl --version
+crictl version 1.24.2-35-g77d02a03
 
-scp _output/* pi@rpi-k8s-master.hide.lukasmaly.net:~/bin/
+scp build/bin/* pi@rpi-k8s-master.hide.lukasmaly.net:~/bin/
 ```
 
 # NEDOKONCENO !!!
