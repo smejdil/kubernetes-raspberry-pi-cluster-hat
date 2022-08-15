@@ -1,6 +1,6 @@
 # How to install Kubernetes from scratch using Raspberry Pi and ClusterHAT 
 
-This is a learning exercise on how to install Kubernetes from scratch on Raspberry Pi 3 (master) and Zeros (workers). 
+This is a learning exercise on how to install Kubernetes from scratch on Raspberry Pi 4 (master) and Zeros (workers). 
 
 In this guide I'll walk you through the famous guide [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) created by [Kelsey Hightower](https://github.com/kelseyhightower) I like to call this guide: the very very hard way. 
 
@@ -37,4 +37,5 @@ The final result should look like this:
 - [Part 12 - NGINX Ingress Controller](12-Ingress-Controller.md)
 - [Part 13 - TLS Termination](13-TLS-Termination.md)
 - [Part 14 - Metrics Server](14-Metrics-Server.md)
+- [Part 15 - Zabbix monitoring(15-Zabbix-Monitoring.md)
 - Web UI (Dashboard) - TBD

@@ -1,27 +1,28 @@
 # Introduction - Setting Up the Cluster
-This is the second attempt after some time when I first tried to set up such a cluster and I started learning [Kubernetes](https://kubernetes.io/). One of the reasons I wanted to do this is because I have two [Raspberry Pi Zero](https://www.raspberrypi.org/products/raspberry-pi-zero/) (and [Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/)) lying around and a new (at the time) [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/). After experimenting for a bit with them individually, I decided to put them to work together. 
+This is the first attempt after some time when I tried to set up such a cluster and I started learning [Kubernetes](https://kubernetes.io/). One of the reasons I wanted to do this is because I have four [Raspberry Pi Zero](https://www.raspberrypi.org/products/raspberry-pi-zero/) lying around and a new (at the time) [Raspberry Pi 4](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/). After experimenting for a bit with them individually, I decided to put them to work together. I am also getting acquainted with [Zabbix](https://www.zabbix.com) [monitoring K8S](https://www.zabbix.com/cz/integrations/kubernetes) and need somewhere to test it.
+
 
 Some research brought my attention to [ClusterHAT](https://clusterhat.com/) which simplified all the messing around with USB gadgets to make the Pi Zeros believe they’re connected to a network using USB. Having tested it for a while, I decided to give it a go and install a Kubernetes cluster. 
 ## Hardware
 
 The specific hardware I used for this exercise is:
 
-* Raspberry Pi 3
+* Raspberry Pi 4
 * Raspberry Pi Zero
-* Raspberry Pi Zero W
-* Cluster HAT v2.3
-* 3 x micro SD cards (16 GB for master and 8 GB for workers)
+* Cluster HAT v2.5
+* 5 x micro SD cards (32 GB for master and 32 GB for workers)
 
-For instruction on how to set up the hardware, see [their website](https://clusterctrl.com/setup-assembly).
+For instruction on how to set up the hardware, see [their website](https://clusterctrl.com/setup-assembly). Bought [here](https://rpishop.cz/clustery/2973-cluster-hat-kit.html).
 
 ## Operating System
 
 Download the images for each Pi: controller CNAT and each pi (p1 .. p4) in this case I only used p1 and p2 as I only have two pi zeros. As of this writing, these are the files available to download from [clusterctrl downloads](https://clusterctrl.com/setup-software) I chose the lite version (no Desktop or GUI) and CNAT to use the internal NAT network.
 
-* [Controller] 2020-08-20-8-ClusterCTRL-armhf-lite-CNAT.img
-* [Worker 1] 2020-08-20-8-ClusterCTRL-armhf-lite-p1.img
-* [Worker 2] 2020-08-20-8-ClusterCTRL-armhf-lite-p2.img
-
+* [Controller] 2022-04-04-2-bullseye-ClusterCTRL-arm64-lite-CNAT.img
+* [Worker 1] 2022-04-04-2-bullseye-ClusterCTRL-arm64-lite-p1.img
+* [Worker 2] 2022-04-04-2-bullseye-ClusterCTRL-arm64-lite-p2.img
+* [Worker 3] 2022-04-04-2-bullseye-ClusterCTRL-arm64-lite-p3.img
+* [Worker 4] 2022-04-04-2-bullseye-ClusterCTRL-arm64-lite-p4.img
 
 
 ## Preparing the Controller
@@ -35,7 +36,7 @@ Mount the microSD card and in /boot partition modify the file `/boot/wpa_supplic
 ```
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
-country=GB
+country=CZ
 
 network={
  ssid="XYZ"
@@ -49,17 +50,15 @@ Create an empty file to allow SSH service to start with the system.
 touch /boot/ssh
 ```
 
-
 ### Understand the Networking Model
-
 
 Host name      |   External IP |    Internal IP | Role   |
 ---------------|---------------|----------------|--------|
 rpi-k8s-master | 192.168.1.164 | 172.19.181.254 | master |
 p1             |      NAT      | 172.19.181.1   | worker |
 p2             |      NAT      | 172.19.181.2   | worker |
-
-
+p3             |      NAT      | 172.19.181.3   | worker |
+p4             |      NAT      | 172.19.181.4   | worker |
 
 Diagram 
 
