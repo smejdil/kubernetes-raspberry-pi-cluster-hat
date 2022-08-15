@@ -50,6 +50,15 @@ Create an empty file to allow SSH service to start with the system.
 touch /boot/ssh
 ```
 
+Setup password for user pi.
+
+```shell
+echo 'mypassword' | openssl passwd -6 -stdin
+
+vi /boot/userconf.txt
+pi:encrypted-password
+```
+
 ### Understand the Networking Model
 
 Host name      |   External IP |    Internal IP | Role   |
