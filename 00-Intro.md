@@ -63,11 +63,11 @@ pi:encrypted-password
 
 Host name      |   External IP |    Internal IP | Role   |
 ---------------|---------------|----------------|--------|
-rpi-k8s-master | 192.168.5.150 | 172.19.180.150 | master |
-p1             |      NAT      | 172.19.180.1   | worker |
-p2             |      NAT      | 172.19.180.2   | worker |
-p3             |      NAT      | 172.19.180.3   | worker |
-p4             |      NAT      | 172.19.180.4   | worker |
+rpi-k8s-master | 192.168.5.150 | 172.19.181.150 | master |
+p1             |      NAT      | 172.19.181.1   | worker |
+p2             |      NAT      | 172.19.181.2   | worker |
+p3             |      NAT      | 172.19.181.3   | worker |
+p4             |      NAT      | 172.19.181.4   | worker |
 
 Diagram 
 
