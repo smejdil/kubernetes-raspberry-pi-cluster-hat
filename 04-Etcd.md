@@ -72,5 +72,5 @@ sudo etcdctl member list \
 
 Output
 ```
-8e9e05c52164694d, started, rpi-k8s-master, http://localhost:2380, https://172.19.181.254:2379, false  
+8e9e05c52164694d, started, rpi-k8s-master, http://localhost:2380, https://172.19.181.254:2379, false
 ```
