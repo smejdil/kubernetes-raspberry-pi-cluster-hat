@@ -14,6 +14,7 @@ Use docker to build the binaries, although it’s not necessary, it removes the 
 ```shell
 git clone https://github.com/kubernetes/kubernetes.git
 cd kubernetes
+git checkout v1.24.3
 
 docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
 
@@ -28,19 +29,19 @@ root@f39f79b0536b:/usr/src/myapp# apt update
 root@f39f79b0536b:/usr/src/myapp# apt install rsync
 
 root@f39f79b0536b:/usr/src/myapp# time make WHAT=cmd/kube-scheduler
-real	8m12.605s
-user	16m58.260s
-sys	2m11.420s
+real	8m50.589s
+user	15m7.822s
+sys	2m6.539s
 
 root@f39f79b0536b:/usr/src/myapp# time make WHAT=cmd/kube-controller-manager
-real	5m59.615s
-user	15m26.843s
-sys	1m53.155s
+real	6m50.607s
+user	15m24.535s
+sys	1m56.417s
 
 root@f39f79b0536b:/usr/src/myapp# time make WHAT=cmd/kube-apiserver         
-real	1m19.790s
-user	2m9.285s
-sys	0m22.332s
+real	1m57.069s
+user	2m6.579s
+sys	0m25.329s
 
 
 root@f39f79b0536b:/usr/src/myapp# time make WHAT=cmd/kubectl
@@ -59,15 +60,15 @@ scp _output/local/bin/linux/arm64/kube* pi@rpi-k8s-master.hide.lukasmaly.net:~/b
 
 ## Build Kubernetes Binaries for Worker Nodes
 
-#Before building kubelet, I found numerous issues with a missing cgroup (cpuset) in the raspberry pi zero. I’m not entirely sure why this is a requirement and I removed it from the code. I published my findings in the [raspberry pi forum](https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=219644#p1348691). 
+Before building kubelet, I found numerous issues with a missing cgroup (cpuset) in the raspberry pi zero. I’m not entirely sure why this is a requirement and I removed it from the code. I published my findings in the [raspberry pi forum](https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=219644#p1348691). 
 
-#To avoid having those issues I removed the validation as follows: 
+To avoid having those issues I removed the validation as follows: 
 
-#```
-#File: pkg/kubelet/cm/container_manager_linux.go
-#- expectedCgroups := sets.NewString("cpu", "cpuacct", "cpuset", "memory")
-#+ expectedCgroups := sets.NewString("cpu", "cpuacct", "memory")
-#```
+```
+File: pkg/kubelet/cm/container_manager_linux.go
+- expectedCgroups := sets.NewString("cpu", "cpuacct", "cpuset", "memory")
++ expectedCgroups := sets.NewString("cpu", "cpuacct", "memory")
+```
 
 ```shell
 docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
@@ -83,14 +84,14 @@ root@e3b475b2f53e:/usr/src/myapp# apt update
 root@e3b475b2f53e:/usr/src/myapp# apt install rsync
 
 root@e3b475b2f53e:/usr/src/myapp# time make WHAT=cmd/kubelet
-real	1m50.322s
-user	3m22.416s
-sys	0m35.184s
+real	0m44.872s
+user	0m29.645s
+sys	0m12.094s
 
 root@e3b475b2f53e:/usr/src/myapp# time make WHAT=cmd/kube-proxy
-real	0m26.961s
-user	0m29.413s
-sys	0m10.101s
+real	0m30.417s
+user	0m29.454s
+sys	0m10.528s
 ```
 
 Copy the binaries to master to then transfer to worker nodes
@@ -107,6 +108,7 @@ We are not going to use all the networking plugins, but to make our life easier,
 ```shell
 git clone https://github.com/containernetworking/plugins.git 
 cd plugins
+git checkout v 1.1.1
 
 sed -i 's/\$GO\ build -o \"\${PWD}\/bin\/\$plugin\" \"\$\@\"/\$GO\ build -o \"\$\{PWD\}\/bin\/\$plugin\" \"\$\@\"\ \-ldflags\=\"\-d\ \-s\ \-w\"/' build_linux.sh
 
