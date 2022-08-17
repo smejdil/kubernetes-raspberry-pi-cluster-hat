@@ -170,18 +170,7 @@ NAME                 STATUS    MESSAGE             ERROR
 scheduler            Healthy   ok
 controller-manager   Healthy   ok
 etcd-0               Healthy   {"health":"true"}
-
-:-(
-
-Warning: v1 ComponentStatus is deprecated in v1.19+
-NAME                 STATUS      MESSAGE                                                                                        ERROR
-scheduler            Unhealthy   Get "https://127.0.0.1:10259/healthz": dial tcp 127.0.0.1:10259: connect: connection refused   
-etcd-0               Healthy     {"health":"true","reason":""}                                                                  
-controller-manager   Healthy     ok
-
 ```
-
-! NEDOKONCWNO !
 
 However, this might not work in some cases, in [this github issue](https://github.com/kubernetes/kubernetes/issues/93472), they recommend not to use that any more, as it’s deprecated, you might get a message looks like this:
 
@@ -227,7 +216,7 @@ Inside master node at $HOME directory. Create ClusterRole and ClusterRoleBinding
 
 ```shell
 cat <<EOF | kubectl apply --kubeconfig config/admin.kubeconfig -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -249,9 +238,12 @@ rules:
 EOF
 ```
 
+clusterrole.rbac.authorization.k8s.io/system:kube-apiserver-to-kubelet created
+
+
 ```shell
 cat <<EOF | kubectl apply --kubeconfig config/admin.kubeconfig -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: system:kube-apiserver
@@ -267,6 +259,9 @@ subjects:
 EOF
 ```
 
+clusterrolebinding.rbac.authorization.k8s.io/system:kube-apiserver created
+
+
 ## Test the Control Plane
 
 Since there is only one master node, there is no need for an external load balancer. In that case, we already have the public IP, test the `/version` endpoint from outside the cluster.
@@ -280,18 +275,18 @@ $ scp pi@rpi-k8s-master.local:/home/pi/certs/ca.pem .
 Test the curl command using the certificate.
 
 ```shell
-$ KUBERNETES_PUBLIC_ADDRESS=192.168.1.164
+$ KUBERNETES_PUBLIC_ADDRESS=192.168.5.150
 $ curl --cacert ca.pem https://${KUBERNETES_PUBLIC_ADDRESS}:6443/version
 {
   "major": "1",
-  "minor": "18+",
-  "gitVersion": "v1.18.13-rc.0.15+6d211539692cee",
-  "gitCommit": "6d211539692cee9ca82d8e1a6831f7e51e66558d",
-  "gitTreeState": "clean",
-  "buildDate": "2020-11-23T19:28:31Z",
-  "goVersion": "go1.15.5",
+  "minor": "24+",
+  "gitVersion": "v1.24.3-dirty",
+  "gitCommit": "aef86a93758dc3cb2c658dd9657ab4ad4afc21cb",
+  "gitTreeState": "dirty",
+  "buildDate": "2022-08-17T13:20:35Z",
+  "goVersion": "go1.19",
   "compiler": "gc",
-  "platform": "linux/arm"
+  "platform": "linux/arm64"
 }
 ```
 
@@ -300,7 +295,8 @@ Success!
 ## Transfer the Binaries to the Worker Nodes
 
 ```shell
-for instance in p1 p2; do
+for instance in p1 p2 p3; do
+  ssh ${instance} mkdir ~/bin/
   scp /usr/local/bin/kubectl ${instance}:~/bin/
   scp plugins/* ${instance}:~/bin/
   scp bin/* ${instance}:~/bin/  
