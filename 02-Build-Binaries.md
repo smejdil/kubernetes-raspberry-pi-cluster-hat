@@ -13,6 +13,7 @@ Use docker to build the binaries, although it’s not necessary, it removes the 
 
 ```shell
 git clone https://github.com/kubernetes/kubernetes.git
+cd kubernetes
 
 docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
 
@@ -105,6 +106,7 @@ We are not going to use all the networking plugins, but to make our life easier,
 
 ```shell
 git clone https://github.com/containernetworking/plugins.git 
+cd plugins
 
 sed -i 's/\$GO\ build -o \"\${PWD}\/bin\/\$plugin\" \"\$\@\"/\$GO\ build -o \"\$\{PWD\}\/bin\/\$plugin\" \"\$\@\"\ \-ldflags\=\"\-d\ \-s\ \-w\"/' build_linux.sh
 
@@ -121,6 +123,7 @@ scp bin/* pi@rpi-k8s-master.hide.lukasmaly.net:~/plugins/
 
 ```shell
 git clone https://github.com/opencontainers/runc.git
+cd runc
 
 docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
 
@@ -145,6 +148,7 @@ scp ./runc ./contrib/cmd/recvtty/recvtty.go pi@rpi-k8s-master.hide.lukasmaly.net
 
 ```shell
 git clone https://github.com/containerd/containerd.git
+cd containerd
 
 docker run --rm -it -v "$PWD":/go/src/github.com/containerd/containerd -w /go/src/github.com/containerd/containerd arm64v8/golang:1.19.0-bullseye bash
 
@@ -162,6 +166,7 @@ scp bin/* pi@rpi-k8s-master.hide.lukasmaly.net:~/bin/
 
 ```shell
 git clone https://github.com/kubernetes-sigs/cri-tools.git
+cd cri-tools
 
 docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
 
@@ -172,8 +177,6 @@ crictl version 1.24.2-35-g77d02a03
 scp build/bin/* pi@rpi-k8s-master.hide.lukasmaly.net:~/bin/
 ```
 
-# NEDOKONCENO !!!
-
 ## Build Etcd 
 
 `etcd` is the main database that maintains the cluster state. 
@@ -183,11 +186,10 @@ scp build/bin/* pi@rpi-k8s-master.hide.lukasmaly.net:~/bin/
 ```shell
 git clone https://github.com/etcd-io/etcd.git
 cd etcd
-git checkout release-3.4
 
-docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm32v7/golang:1.19.0-bullseye bash
+docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
 
-root@3a6d3a16f556:/usr/src/myapp# ./build
+root@3a6d3a16f556:/usr/src/myapp# make
 root@3a6d3a16f556:/usr/src/myapp# ls -l bin/
 total 42624
 -rwxr-xr-x 1 root root 24999558 Nov 26 11:22 etcd
@@ -197,7 +199,7 @@ total 42624
 ### Transfer the binaries to the master
 
 ```shell
-scp ./bin/* pi@rpi-k8s-master.local:~/bin
+scp ./bin/* pi@rpi-k8s-master.hide.lukasmaly.net:~/bin
 ```
 
 ### Test the binaries in the master node
@@ -207,14 +209,14 @@ The environment variable ETCD_UNSUPPORTED_ARCH=arm needs setting, otherwise we g
 ```shell
 $ ETCD_UNSUPPORTED_ARCH=arm bin/etcd --version
 running etcd on unsupported architecture "arm" since ETCD_UNSUPPORTED_ARCH is set
-etcd Version: 3.4.13
-Git SHA: eb0fb0e79
-Go Version: go1.15.5
-Go OS/Arch: linux/arm
+etcd Version: 3.6.0-alpha.0
+Git SHA: ff6b85da8
+Go Version: go1.19
+Go OS/Arch: linux/arm64
 
 $ bin/etcdctl version
-etcdctl version: 3.4.13
-API version: 3.4
+etcdctl version: 3.6.0-alpha.0
+API version: 3.6
 ```
 
 ## Build Pause
@@ -222,12 +224,14 @@ API version: 3.4
 This step is more for the sake of completeness of building everything from the source, in case you want to create your own version of the `pause` container which is a fundamental pillar of the pod structure.
 
 ```shell
-docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm32v5/golang:1.19.0-bullseye bash
+cd kubernetes
 
-root@637ae3b798bc:/usr/src/myapp# cd build/pause/
-root@637ae3b798bc:/usr/src/myapp/build/pause# gcc -Os -Wall -Werror -static -s -g -fPIE -fPIC -o pause pause.c
+docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp arm64v8/golang:1.19.0-bullseye bash
+
+root@637ae3b798bc:/usr/src/myapp# cd build/pause/linux
+root@637ae3b798bc:/usr/src/myapp/build/pause/linux# gcc -Os -Wall -Werror -static -s -g -fPIE -fPIC -o pause pause.c
 ```
 
 ```shell
-scp build/pause/pause pi@rpi-k8s-master.local:~/bin
+scp pause pi@rpi-k8s-master.hide.lukasmaly.net:~/bin
 ```
