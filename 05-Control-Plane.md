@@ -27,7 +27,7 @@ sudo mv config/encryption-config.yaml /var/lib/kubernetes/
 
 ```shell
 INTERNAL_IP=172.19.181.254
-KUBERNETES_PUBLIC_ADDRESS=192.168.1.164
+KUBERNETES_PUBLIC_ADDRESS=192.168.5.150
 ```
 
 ```shell
@@ -59,9 +59,10 @@ ExecStart=/usr/local/bin/kube-apiserver \\
   --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
   --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\
   --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\
-  --kubelet-https=true \\
   --runtime-config='api/all=true' \\
   --service-account-key-file=/var/lib/kubernetes/service-account.pem \\
+  --service-account-signing-key-file=/var/lib/kubernetes/service-account-key.pem \\
+  --service-account-issuer=api \\
   --service-cluster-ip-range=10.32.0.0/24 \\
   --service-node-port-range=30000-32767 \\
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \\
@@ -124,6 +125,13 @@ clientConnection:
 leaderElection:
   leaderElect: true
 EOF
+
+apiVersion: kubescheduler.config.k8s.io/v1alpha1
+kind: KubeSchedulerConfiguration
+clientConnection:
+  kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
+leaderElection:
+  leaderElect: true
 ```
 
 ```shell
@@ -162,7 +170,18 @@ NAME                 STATUS    MESSAGE             ERROR
 scheduler            Healthy   ok
 controller-manager   Healthy   ok
 etcd-0               Healthy   {"health":"true"}
+
+:-(
+
+Warning: v1 ComponentStatus is deprecated in v1.19+
+NAME                 STATUS      MESSAGE                                                                                        ERROR
+scheduler            Unhealthy   Get "https://127.0.0.1:10259/healthz": dial tcp 127.0.0.1:10259: connect: connection refused   
+etcd-0               Healthy     {"health":"true","reason":""}                                                                  
+controller-manager   Healthy     ok
+
 ```
+
+! NEDOKONCWNO !
 
 However, this might not work in some cases, in [this github issue](https://github.com/kubernetes/kubernetes/issues/93472), they recommend not to use that any more, as it’s deprecated, you might get a message looks like this:
 
