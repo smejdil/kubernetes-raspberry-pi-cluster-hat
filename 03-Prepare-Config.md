@@ -10,13 +10,13 @@ For this step we need kubectl to be in the $PATH, move it to `/usr/local/bin` if
 sudo mv ~/bin/kubectl /usr/local/bin/
 ```
 ```shell
-KUBERNETES_PUBLIC_ADDRESS=192.168.1.164
+KUBERNETES_PUBLIC_ADDRESS=192.168.5.150
 ```
 
 ## The `kubelet` Kubernetes Configuration File
 
 ```shell
-for instance in p1 p2; do
+for instance in p1 p2 p3; do
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.pem \
     --embed-certs=true \
@@ -36,6 +36,19 @@ for instance in p1 p2; do
 
   kubectl config use-context default --kubeconfig=${instance}.kubeconfig
 done
+
+Cluster "kubernetes-the-hard-way" set.
+User "system:node:p1" set.
+Context "default" created.
+Switched to context "default".
+Cluster "kubernetes-the-hard-way" set.
+User "system:node:p2" set.
+Context "default" created.
+Switched to context "default".
+Cluster "kubernetes-the-hard-way" set.
+User "system:node:p3" set.
+Context "default" created.
+Switched to context "default".
 ```
 
 ## The `kube-proxy` Kubernetes Configuration File
@@ -59,6 +72,11 @@ kubectl config set-context default \
     --kubeconfig=kube-proxy.kubeconfig
 
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+
+Cluster "kubernetes-the-hard-way" set.
+User "system:kube-proxy" set.
+Context "default" created.
+Switched to context "default".
 ```
 
 ## The `kube-controller-manager` Kubernetes Configuration File
@@ -82,6 +100,11 @@ kubectl config set-context default \
     --kubeconfig=kube-controller-manager.kubeconfig
 
 kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+
+Cluster "kubernetes-the-hard-way" set.
+User "system:kube-controller-manager" set.
+Context "default" created.
+Switched to context "default".
 ```
 
 ## The `kube-scheduler` Kubernetes Configuration File
@@ -105,6 +128,11 @@ kubectl config set-context default \
     --kubeconfig=kube-scheduler.kubeconfig
 
 kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
+
+Cluster "kubernetes-the-hard-way" set.
+User "system:kube-scheduler" set.
+Context "default" created.
+Switched to context "default".
 ```
 
 ## The `admin` Kubernetes Configuration File
@@ -128,6 +156,11 @@ kubectl config set-context default \
     --kubeconfig=admin.kubeconfig
 
 kubectl config use-context default --kubeconfig=admin.kubeconfig
+
+Cluster "kubernetes-the-hard-way" set.
+User "admin" set.
+Context "default" created.
+Switched to context "default".
 ```
 
 ## Generating the Data Encryption Config and Key
@@ -153,10 +186,17 @@ EOF
 ## Distribute the Files
 
 ```shell
-for instance in p1 p2; do
+for instance in p1 p2 p3; do
   ssh ${instance} "mkdir config"
   scp ${instance}.kubeconfig kube-proxy.kubeconfig ${instance}:~/config/
 done
+
+p1.kubeconfig                                                         100% 6503     2.3MB/s   00:00    
+kube-proxy.kubeconfig                                                 100% 6485     2.9MB/s   00:00    
+p2.kubeconfig                                                         100% 6499     2.3MB/s   00:00    
+kube-proxy.kubeconfig                                                 100% 6485     2.8MB/s   00:00    
+p3.kubeconfig                                                         100% 6499     2.4MB/s   00:00    
+kube-proxy.kubeconfig                                                 100% 6485     2.9MB/s   00:00 
 
 cp \
   admin.kubeconfig \
