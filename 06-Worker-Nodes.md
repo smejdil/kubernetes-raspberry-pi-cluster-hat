@@ -1,6 +1,6 @@
 # Bootstrapping the Kubernetes Worker Nodes
 
-All the commands need to be run on each of the worker nodes (`p1` and `p2` in this case)
+All the commands need to be run on each of the worker nodes (`p1`, `p2` and `p3` in this case)
 
 ## Prerequisites
 
@@ -52,7 +52,9 @@ sudo mkdir -p \
   /var/run/kubernetes
 
 sudo mv bin/containerd* bin/ctr /bin/
-sudo mv bin/crictl bin/kube* bin/runc bin/recvtty /usr/local/bin/
+sudo mv bin/crictl bin/kube* bin/runc /usr/local/bin/
+sudo mv bin/recvtty.go /usr/local/bin/recvtty
+chmod 755 /usr/local/bin/recvtty
 sudo mv bin/* /opt/cni/bin/
 ```
 
@@ -154,7 +156,10 @@ EOF
 
 ## Configure the Kubelet
 
+! NEDOKONCENO !!!
+
 ```shell
+HOSTNAME=`hostname`
 sudo mv certs/${HOSTNAME}-key.pem certs/${HOSTNAME}.pem /var/lib/kubelet/
 sudo mv config/${HOSTNAME}.kubeconfig /var/lib/kubelet/kubeconfig
 sudo mv certs/ca.pem /var/lib/kubernetes/
@@ -195,11 +200,8 @@ Requires=containerd.service
 [Service]
 ExecStart=/usr/local/bin/kubelet \\
   --config=/var/lib/kubelet/kubelet-config.yaml \\
-  --container-runtime=remote \\
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\
-  --image-pull-progress-deadline=2m \\
   --kubeconfig=/var/lib/kubelet/kubeconfig \\
-  --network-plugin=cni \\
   --register-node=true \\
   --v=2
 Restart=on-failure
@@ -266,8 +268,9 @@ On the master node, $HOME directory, run:
 ```shell
 $ kubectl get nodes --kubeconfig config/admin.kubeconfig
 NAME   STATUS   ROLES    AGE   VERSION                                                                           
-p1     Ready    <none>   34h   v1.18.13-rc.0.15+6d211539692cee-dirty
-p2     Ready    <none>   12m   v1.18.13-rc.0.15+6d211539692cee-dirty
+p1     Ready    <none>   3m59s   v1.24.3-dirty
+p2     Ready    <none>   107s    v1.24.3-dirty
+p3     Ready    <none>   102s    v1.24.3-dirty
 ```
 
 The trailing `-dirty` is because I didn’t commit my changes to the kubelet source above, therefore the build script picked up on it and updated the version id.

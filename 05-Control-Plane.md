@@ -298,6 +298,8 @@ Success!
 for instance in p1 p2 p3; do
   ssh ${instance} mkdir ~/bin/
   scp /usr/local/bin/kubectl ${instance}:~/bin/
+  scp /usr/local/bin/kubelet ${instance}:~/bin/
+  scp /usr/local/bin/kube-proxy ${instance}:~/bin/
   scp plugins/* ${instance}:~/bin/
   scp bin/* ${instance}:~/bin/  
 done
