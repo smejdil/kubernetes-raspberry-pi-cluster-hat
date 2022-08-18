@@ -41,26 +41,26 @@ scp pi@rpi-k8s-master.hide.lukasmaly.net:~/.kube/config /home/malyl/.kube/
 
 ```shell
 $ kubectl version
-Client Version: version.Info{Major:"1", Minor:"24+", GitVersion:"v1.24.3-dirty", GitCommit:"aef86a93758dc3cb2c658dd9657ab4ad4afc21cb", GitTreeState:"dirty", BuildDate:"2022-08-17T13:25:16Z", GoVersion:"go1.19", Compiler:"gc", Platform:"linux/arm64"}
+Client Version: version.Info{Major:"1", Minor:"24", GitVersion:"v1.24.4", GitCommit:"95ee5ab382d64cfe6c28967f36b53970b8374491", GitTreeState:"clean", BuildDate:"2022-08-17T18:54:23Z", GoVersion:"go1.18.5", Compiler:"gc", Platform:"linux/amd64"}
 Kustomize Version: v4.5.4
 Server Version: version.Info{Major:"1", Minor:"24+", GitVersion:"v1.24.3-dirty", GitCommit:"aef86a93758dc3cb2c658dd9657ab4ad4afc21cb", GitTreeState:"dirty", BuildDate:"2022-08-17T13:20:35Z", GoVersion:"go1.19", Compiler:"gc", Platform:"linux/arm64"}
 ```
 
 ```shell
 $ kubectl get componentstatuses
-kubectl get componentstatuses
+Warning: v1 ComponentStatus is deprecated in v1.19+
 NAME                 STATUS    MESSAGE                         ERROR
-controller-manager   Healthy   ok                              
 scheduler            Healthy   ok                              
-etcd-0               Healthy   {"health":"true","reason":""}
+etcd-0               Healthy   {"health":"true","reason":""}   
+controller-manager   Healthy   ok
 ```
 
 ```shell
 $ kubectl get nodes
-NAME   STATUS   ROLES    AGE    VERSION
-p1     Ready    <none>   24m   v1.24.3-dirty
-p2     Ready    <none>   22m   v1.24.3-dirty
-p3     Ready    <none>   22m   v1.24.3-dirty
+NAME   STATUS   ROLES    AGE   VERSION
+p1     Ready    <none>   8h    v1.24.3-dirty
+p2     Ready    <none>   8h    v1.24.3-dirty
+p3     Ready    <none>   8h    v1.24.3-dirty
 ```
 
 ```shell
@@ -107,7 +107,7 @@ metadata:
 spec:
   containers:
   - name: nginx
-    image: arm64v8/nginx:1.18
+    image: arm64v8/nginx:1.23
     ports:
     - containerPort: 80
 EOF
@@ -115,7 +115,7 @@ EOF
 
 pod/nginx-pod created
 
-! NEDOKONCENO !
+!!! NEDOKONCENO !!!
 
 ```shell
 kubectl get pods -o wide -w

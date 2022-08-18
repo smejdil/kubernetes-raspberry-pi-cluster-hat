@@ -1,12 +1,12 @@
 # Provisioning Pod Network Routes
 
-In two terminals, run two pods using `arm32v5/busybox` and execute a shell in each of them. Run the following commands:
+In two terminals, run two pods using `arm64v8/busybox` and execute a shell in each of them. Run the following commands:
 
 ```shell
-kubectl run shell1 --rm -it --image arm32v5/busybox -- sh
+kubectl run shell1 --rm -it --image arm64v8/busybox -- sh
 ```
 ```shell
-kubectl run shell2 --rm -it --image arm32v5/busybox -- sh
+kubectl run shell2 --rm -it --image arm64v8/busybox -- sh
 ```
 
 Verify they’re scheduled in two different nodes. If not, create more pods until they are scheduled in two different nodes.
@@ -21,7 +21,7 @@ shell2   1/1     Running   0          14m   10.200.1.30   p2
 ## Test without Routes
 
 ```shell
-kubectl run shell1 --rm -it --image arm32v5/busybox -- sh
+kubectl run shell1 --rm -it --image arm64v8/busybox -- sh
 If you don't see a command prompt, try pressing enter.
 / # hostname -i
 10.200.0.59
@@ -33,7 +33,7 @@ PING 10.200.1.30 (10.200.1.30): 56 data bytes
 ```
 
 ```shell
-kubectl run shell2 --rm -it --image arm32v5/busybox -- sh
+kubectl run shell2 --rm -it --image arm64v8/busybox -- sh
 If you don't see a command prompt, try pressing enter.
 / # hostname -i
 10.200.1.30
@@ -56,7 +56,7 @@ sudo route add -net 10.200.1.0 netmask 255.255.255.0 gw 172.19.181.2
 ## Repeat the Test with Routes in Place
 
 ```shell
-kubectl run shell1 --rm -it --image arm32v5/busybox -- sh
+kubectl run shell1 --rm -it --image arm64v8/busybox -- sh
 If you don't see a command prompt, try pressing enter.
 / # hostname -i
 10.200.0.59
@@ -70,7 +70,7 @@ PING 10.200.1.30 (10.200.1.30): 56 data bytes
 ```
 
 ```shell
-kubectl run shell2 --rm -it --image arm32v5/busybox -- sh
+kubectl run shell2 --rm -it --image arm64v8/busybox -- sh
 If you don't see a command prompt, try pressing enter.
 / # hostname -i
 10.200.1.30

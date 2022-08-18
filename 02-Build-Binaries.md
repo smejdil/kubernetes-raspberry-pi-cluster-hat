@@ -151,6 +151,7 @@ scp ./runc ./contrib/cmd/recvtty/recvtty.go pi@rpi-k8s-master.hide.lukasmaly.net
 ```shell
 git clone https://github.com/containerd/containerd.git
 cd containerd
+git checkout v1.6.8
 
 docker run --rm -it -v "$PWD":/go/src/github.com/containerd/containerd -w /go/src/github.com/containerd/containerd arm64v8/golang:1.19.0-bullseye bash
 
