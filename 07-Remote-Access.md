@@ -5,7 +5,7 @@ Run in master node, $HOME directory, also embed all the certificates in the conf
 ## Prepare Configuration File
 
 ```shell
-KUBERNETES_PUBLIC_ADDRESS=192.168.1.164
+KUBERNETES_PUBLIC_ADDRESS=192.168.5.150
 ```
 
 ```shell
@@ -24,35 +24,43 @@ kubectl config set-context kubernetes-the-hard-way \
     --user=admin
 
 kubectl config use-context kubernetes-the-hard-way
+
+Cluster "kubernetes-the-hard-way" set.
+User "admin" set.
+Context "kubernetes-the-hard-way" created.
+Switched to context "kubernetes-the-hard-way".
 ```
 
 The result is stored in `~/.kube/config` file, download the config file.
 
 ```shell
-scp pi@rpi-k8s-master.local:~/.kube/config /home/abel/.kube/
+scp pi@rpi-k8s-master.hide.lukasmaly.net:~/.kube/config /home/malyl/.kube/
 ```
 
 ## Verification from Remote Computer
 
 ```shell
 $ kubectl version
-Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.4", GitCommit:"d360454c9bcd1634cf4cc52d1867af5491dc9c5f", GitTreeState:"clean", BuildDate:"2020-11-11T13:17:17Z", GoVersion:"go1.15.2", Compiler:"gc", Platform:"linux/amd64"}
-Server Version: version.Info{Major:"1", Minor:"18+", GitVersion:"v1.18.13-rc.0.15+6d211539692cee", GitCommit:"6d211539692cee9ca82d8e1a6831f7e51e66558d", GitTreeState:"clean", BuildDate:"2020-11-23T19:28:31Z", GoVersion:"go1.15.5", Compiler:"gc", Platform:"linux/arm"}
+Client Version: version.Info{Major:"1", Minor:"24+", GitVersion:"v1.24.3-dirty", GitCommit:"aef86a93758dc3cb2c658dd9657ab4ad4afc21cb", GitTreeState:"dirty", BuildDate:"2022-08-17T13:25:16Z", GoVersion:"go1.19", Compiler:"gc", Platform:"linux/arm64"}
+Kustomize Version: v4.5.4
+Server Version: version.Info{Major:"1", Minor:"24+", GitVersion:"v1.24.3-dirty", GitCommit:"aef86a93758dc3cb2c658dd9657ab4ad4afc21cb", GitTreeState:"dirty", BuildDate:"2022-08-17T13:20:35Z", GoVersion:"go1.19", Compiler:"gc", Platform:"linux/arm64"}
 ```
 
 ```shell
 $ kubectl get componentstatuses
-NAME                 STATUS    MESSAGE             ERROR
-controller-manager   Healthy   ok                  
-scheduler            Healthy   ok                  
-etcd-0               Healthy   {"health":"true"}   
+kubectl get componentstatuses
+NAME                 STATUS    MESSAGE                         ERROR
+controller-manager   Healthy   ok                              
+scheduler            Healthy   ok                              
+etcd-0               Healthy   {"health":"true","reason":""}
 ```
 
 ```shell
 $ kubectl get nodes
 NAME   STATUS   ROLES    AGE    VERSION
-p1     Ready    <none>   36h    v1.18.13-rc.0.15+6d211539692cee-dirty
-p2     Ready    <none>   114m   v1.18.13-rc.0.15+6d211539692cee-dirty
+p1     Ready    <none>   24m   v1.24.3-dirty
+p2     Ready    <none>   22m   v1.24.3-dirty
+p3     Ready    <none>   22m   v1.24.3-dirty
 ```
 
 ```shell
@@ -60,15 +68,18 @@ $ kubectl get --raw='/readyz?verbose'
 [+]ping ok
 [+]log ok
 [+]etcd ok
+[+]informer-sync ok
 [+]poststarthook/start-kube-apiserver-admission-initializer ok
 [+]poststarthook/generic-apiserver-start-informers ok
+[+]poststarthook/priority-and-fairness-config-consumer ok
+[+]poststarthook/priority-and-fairness-filter ok
 [+]poststarthook/start-apiextensions-informers ok
 [+]poststarthook/start-apiextensions-controllers ok
 [+]poststarthook/crd-informer-synced ok
 [+]poststarthook/bootstrap-controller ok
 [+]poststarthook/rbac/bootstrap-roles ok
 [+]poststarthook/scheduling/bootstrap-system-priority-classes ok
-[+]poststarthook/apiserver/bootstrap-system-flowcontrol-configuration ok
+[+]poststarthook/priority-and-fairness-config-producer ok
 [+]poststarthook/start-cluster-authentication-info-controller ok
 [+]poststarthook/start-kube-aggregator-informers ok
 [+]poststarthook/apiservice-registration-controller ok
@@ -76,8 +87,9 @@ $ kubectl get --raw='/readyz?verbose'
 [+]poststarthook/kube-apiserver-autoregistration ok
 [+]autoregister-completion ok
 [+]poststarthook/apiservice-openapi-controller ok
+[+]poststarthook/apiservice-openapiv3-controller ok
 [+]shutdown ok
-healthz check passed
+readyz check passed
 ```
 
 ## Test Pod Creation
@@ -95,11 +107,15 @@ metadata:
 spec:
   containers:
   - name: nginx
-    image: arm32v5/nginx:1.18
+    image: arm64v8/nginx:1.18
     ports:
     - containerPort: 80
 EOF
 ```
+
+pod/nginx-pod created
+
+! NEDOKONCENO !
 
 ```shell
 kubectl get pods -o wide -w
