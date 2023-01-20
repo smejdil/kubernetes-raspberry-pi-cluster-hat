@@ -37,5 +37,5 @@ The final result should look like this:
 - [Part 12 - NGINX Ingress Controller](12-Ingress-Controller.md)
 - [Part 13 - TLS Termination](13-TLS-Termination.md)
 - [Part 14 - Metrics Server](14-Metrics-Server.md)
-- [Part 15 - Zabbix monitoring(15-Zabbix-Monitoring.md)
+- [Part 15 - Zabbix monitoring](15-Zabbix-Monitoring.md)
 - Web UI (Dashboard) - TBD
